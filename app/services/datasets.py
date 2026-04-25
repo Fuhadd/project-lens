@@ -2,6 +2,7 @@ import requests
 import os
 import time
 from app.core.config import settings
+from app.cache import cache_get, cache_set, make_cache_key
 
 
 # ── Kaggle ────────────────────────────────────────────────
@@ -250,6 +251,7 @@ def search_datasets(query: str, max_per_source: int = 5) -> dict:
     Search both Kaggle and HuggingFace in one call.
     Returns unified dataset results with quality scores.
     """
+    
     print(f"\n🔍 Searching datasets for: '{query}'...")
 
     kaggle = search_kaggle_datasets(query, max_results=max_per_source)

@@ -8,11 +8,24 @@ from github_search import search_github_repos, identify_gaps
 import json
 from datetime import datetime
 from app.services.datasets import search_datasets as fetch_datasets
+from app.cache import cache_get, cache_set, make_cache_key
+
 
 def unified_search(query: str, max_per_source: int = 5) -> dict:
     """
-    Project Lens core search — queries all sources in one call.
+    Project Lens core search with Redis caching.
+    Cache TTL: 1 hour — same query returns instantly.
     """
+    
+    # Check cache first
+    cache_key = make_cache_key("unified", query=query, limit=max_per_source)
+    cached = cache_get(cache_key)
+    if cached:
+        print(f"⚡ Cache HIT: '{query}'")
+        cached["from_cache"] = True
+        return cached
+
+   
     print(f"\n{'='*60}")
     print(f"  PROJECT LENS — Unified Search")
     print(f"  Query: '{query}'")
@@ -78,6 +91,8 @@ def unified_search(query: str, max_per_source: int = 5) -> dict:
 
     # Store deduplicated papers for display
     results["all_papers"] = all_papers
+    cache_set(cache_key, results, ttl=3600)
+    results["from_cache"] = False
 
     return results
 

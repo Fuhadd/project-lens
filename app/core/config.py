@@ -38,6 +38,7 @@ class Settings:
     KAGGLE_API_TOKEN: str = os.getenv("KAGGLE_API_TOKEN", "")
     HUGGINGFACE_API_KEY: str = os.getenv("HUGGINGFACE_API_KEY", "")
     KAGGLE_USERNAME: str = os.getenv("KAGGLE_USERNAME", "")
+    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379")
 
     def validate(self):
         if not self.SEMANTIC_SCHOLAR_API_KEY:

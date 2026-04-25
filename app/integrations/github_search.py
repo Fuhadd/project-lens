@@ -2,6 +2,7 @@ import requests
 import json
 import time
 from datetime import datetime
+from app.cache import cache_get, cache_set, make_cache_key
 
 
 def search_github_repos(query: str, max_results: int = 10) -> list[dict]:
@@ -15,7 +16,15 @@ def search_github_repos(query: str, max_results: int = 10) -> list[dict]:
     Returns:
         A list of repository dictionaries with quality signals
     """
+    # Check cache
+    cache_key = make_cache_key("github", query=query, limit=max_results)
+    cached = cache_get(cache_key)
+    if cached:
+        print(f"⚡ Cache HIT (GitHub): '{query}'")
+        return cached
+
     base_url = "https://api.github.com/search/repositories"
+    
 
     params = {
         "q": query,
@@ -80,6 +89,7 @@ def search_github_repos(query: str, max_results: int = 10) -> list[dict]:
 
     # Sort by quality score
     repos.sort(key=lambda x: x["quality_score"], reverse=True)
+    cache_set(cache_key, repos, ttl=1800)  # 30 min TTL
 
     return repos
 
