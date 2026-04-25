@@ -435,3 +435,106 @@ async def search_datasets_endpoint(
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@router.get("/smart-search", tags=["Search"])
+async def smart_search(
+    q: str = Query(..., min_length=3, description="Your research idea or project description"),
+    limit: int = Query(5, ge=1, le=20),
+    use_llm: bool = Query(True, description="Use LLM for domain detection (smarter but slower)"),
+    provider: str = Query("openai", description="LLM provider: openai or claude"),
+    db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
+):
+    """
+    **🧭 Smart Search — Multi-Domain Routing**
+
+    Automatically detects your project domain and routes to the right sources.
+
+    - **use_llm=true** — GPT-4o-mini or Claude Haiku classifies your query (smarter)
+    - **use_llm=false** — Fast keyword-based detection (instant)
+    - **provider=openai** — Use GPT-4o-mini for routing
+    - **provider=claude** — Use Claude Haiku for routing
+    """
+    from app.services.router import route_search
+
+    try:
+        results = route_search(
+            query=q,
+            max_per_source=limit,
+            use_llm=use_llm,
+            provider=provider,
+        )
+        await save_search(db=db, query=q, results=results, user=current_user)
+        return results
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/detect-domain", tags=["Search"])
+async def detect_domain_endpoint(
+    q: str = Query(..., min_length=3, description="Your research query"),
+    use_llm: bool = Query(True, description="Use LLM detection"),
+    provider: str = Query("openai", description="openai or claude"),
+):
+    """
+    **🔍 Domain Detection**
+
+    Classifies your query into technical, research, hybrid, or generic.
+    Use use_llm=false for instant keyword-based detection.
+    """
+    from app.services.router import detect_domain
+
+    try:
+        return detect_domain(query=q, use_llm=use_llm, provider=provider)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# @router.get("/smart-search", tags=["Search"])
+# async def smart_search(
+#     q: str = Query(..., min_length=3, description="Your research idea or project description"),
+#     limit: int = Query(5, ge=1, le=20),
+#     db: AsyncSession = Depends(get_db),
+#     current_user: Optional[User] = Depends(get_optional_user),
+# ):
+#     """
+#     **🧭 Smart Search — Multi-Domain Routing**
+
+#     Automatically detects what kind of project you're working on
+#     and routes your query to the most relevant sources.
+
+#     - **Technical** (apps, software) → GitHub + datasets prioritised
+#     - **Research** (studies, surveys) → Papers prioritised
+#     - **Hybrid** (ML, data science) → Balanced across all sources
+#     - **Generic** (unclear) → Returns clarifying questions
+
+#     This is the recommended endpoint for Project Lens.
+#     """
+#     from app.services.router import route_search
+
+#     try:
+#         results = route_search(query=q, max_per_source=limit)
+#         await save_search(db=db, query=q, results=results, user=current_user)
+#         return results
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
+
+
+# @router.get("/detect-domain", tags=["Search"])
+# async def detect_domain_endpoint(
+#     q: str = Query(..., min_length=3, description="Your research query"),
+# ):
+#     """
+#     **🔍 Domain Detection**
+
+#     Detects what type of project your query represents
+#     without running a full search. Fast, lightweight.
+
+#     Useful for showing the user what pipeline will be used
+#     before they commit to a full search.
+#     """
+#     from app.services.router import detect_domain
+
+#     try:
+#         return detect_domain(query=q)
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
