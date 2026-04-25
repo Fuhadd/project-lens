@@ -3,6 +3,7 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from arxiv_search import search_arxiv
+from semantic_scholar import search_semantic_scholar
 from github_search import search_github_repos, identify_gaps
 import json
 from datetime import datetime
@@ -11,13 +12,6 @@ from datetime import datetime
 def unified_search(query: str, max_per_source: int = 5) -> dict:
     """
     Project Lens core search — queries all sources in one call.
-
-    Args:
-        query: The research topic or project idea
-        max_per_source: How many results to fetch from each source
-
-    Returns:
-        A unified results dictionary with papers, repos, and gap analysis
     """
     print(f"\n{'='*60}")
     print(f"  PROJECT LENS — Unified Search")
@@ -39,7 +33,14 @@ def unified_search(query: str, max_per_source: int = 5) -> dict:
         "papers": arxiv_papers,
     }
 
-    # ── 2. GitHub ─────────────────────────────────────────
+    # ── 2. Semantic Scholar ───────────────────────────────
+    ss_papers = search_semantic_scholar(query, max_results=max_per_source)
+    results["sources"]["semantic_scholar"] = {
+        "count": len(ss_papers),
+        "papers": ss_papers,
+    }
+
+    # ── 3. GitHub ─────────────────────────────────────────
     repos = search_github_repos(query, max_results=max_per_source)
     gaps = identify_gaps(repos)
     results["sources"]["github"] = {
@@ -48,25 +49,51 @@ def unified_search(query: str, max_per_source: int = 5) -> dict:
     }
     results["gaps"] = gaps
 
-    # ── 3. Summary ────────────────────────────────────────
-    total_sources_found = len(arxiv_papers) + len(repos)
+    # ── 4. Deduplicate papers across arXiv + Semantic Scholar
+    all_papers = deduplicate_papers(arxiv_papers, ss_papers)
 
+    # ── 5. Summary ────────────────────────────────────────
     results["summary"] = {
-        "total_results": total_sources_found,
+        "total_results": len(all_papers) + len(repos),
         "arxiv_papers": len(arxiv_papers),
+        "semantic_scholar_papers": len(ss_papers),
+        "unique_papers": len(all_papers),
         "github_repos": len(repos),
         "average_repo_quality": gaps.get("average_quality_score", 0),
         "gap_opportunities": gaps.get("gap_opportunities", []),
-        "verdict": generate_verdict(arxiv_papers, repos, gaps),
+        "verdict": generate_verdict(all_papers, repos, gaps),
     }
 
+    # Store deduplicated papers for display
+    results["all_papers"] = all_papers
+
     return results
+
+
+def deduplicate_papers(arxiv_papers: list, ss_papers: list) -> list:
+    """
+    Merge arXiv and Semantic Scholar results, removing duplicates.
+    A duplicate is detected by matching words in the title.
+    """
+    seen_titles = set()
+    unique_papers = []
+
+    for paper in arxiv_papers + ss_papers:
+        # Normalise title for comparison
+        normalised = paper["title"].lower().strip()
+        # Use first 6 words as fingerprint
+        fingerprint = " ".join(normalised.split()[:6])
+
+        if fingerprint not in seen_titles:
+            seen_titles.add(fingerprint)
+            unique_papers.append(paper)
+
+    return unique_papers
 
 
 def generate_verdict(papers: list, repos: list, gaps: dict) -> str:
     """
     Generate a human-readable verdict on the research landscape.
-    This is what Project Lens will show students at the top of results.
     """
     paper_count = len(papers)
     repo_count = len(repos)
@@ -74,18 +101,21 @@ def generate_verdict(papers: list, repos: list, gaps: dict) -> str:
     opportunities = gaps.get("gap_opportunities", [])
 
     if paper_count == 0 and repo_count == 0:
-        return "🟢 Highly novel — almost no existing work found. Great opportunity."
+        return "🟢 Highly novel — almost no existing work found. Excellent opportunity."
 
-    if paper_count < 3 and avg_quality < 40:
-        return "🟢 Strong opportunity — limited research and low quality implementations exist."
+    if paper_count < 5 and avg_quality < 40:
+        return "🟢 Strong opportunity — limited research and weak implementations exist."
 
-    if paper_count < 5 and avg_quality < 60:
+    if paper_count < 10 and avg_quality < 60:
         return "🟡 Moderate opportunity — some research exists but implementations are weak."
 
     if opportunities:
         return "🟡 Viable — existing work has clear gaps your project could fill."
 
-    return "🔴 Competitive space — strong existing work. You will need a unique angle."
+    if paper_count >= 10 and avg_quality >= 60:
+        return "🔴 Competitive space — strong existing work. You will need a unique angle."
+
+    return "🟡 Moderate opportunity — room to build something better."
 
 
 def display_unified_results(results: dict) -> None:
@@ -97,8 +127,10 @@ def display_unified_results(results: dict) -> None:
     print(f"\n{'='*60}")
     print(f"  RESULTS SUMMARY")
     print(f"{'='*60}")
-    print(f"  📄 arXiv papers found   : {summary['arxiv_papers']}")
-    print(f"  💻 GitHub repos found   : {summary['github_repos']}")
+    print(f"  📄 arXiv papers         : {summary['arxiv_papers']}")
+    print(f"  📚 Semantic Scholar     : {summary['semantic_scholar_papers']}")
+    print(f"  🔗 Unique papers total  : {summary['unique_papers']}")
+    print(f"  💻 GitHub repos         : {summary['github_repos']}")
     print(f"  📊 Avg repo quality     : {summary['average_repo_quality']}/100")
     print(f"\n  VERDICT: {summary['verdict']}")
 
@@ -108,11 +140,14 @@ def display_unified_results(results: dict) -> None:
             print(f"     → {opp}")
 
     print(f"\n{'='*60}")
-    print(f"  TOP PAPERS (arXiv)")
+    print(f"  TOP PAPERS (combined)")
     print(f"{'='*60}")
-    for i, paper in enumerate(results["sources"]["arxiv"]["papers"][:3], 1):
+    for i, paper in enumerate(results["all_papers"][:5], 1):
+        source = paper.get("source", "arxiv")
+        citations = f" | {paper['citations']} citations" if "citations" in paper else ""
         print(f"\n  [{i}] {paper['title'][:70]}")
-        print(f"       {paper['published']} | {paper['url']}")
+        print(f"       Source: {source}{citations}")
+        print(f"       {paper.get('published') or paper.get('year', '')} | {paper['url']}")
 
     print(f"\n{'='*60}")
     print(f"  TOP REPOSITORIES (GitHub)")
@@ -136,8 +171,6 @@ def save_unified_results(results: dict) -> str:
 
 # ── Entry point ───────────────────────────────────────────
 if __name__ == "__main__":
-    # This is exactly what happens when a student types their idea
-    # into Project Lens and hits search
     query = "AI research idea generator for students"
 
     results = unified_search(query, max_per_source=5)
