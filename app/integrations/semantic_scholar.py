@@ -2,7 +2,7 @@ import requests
 import json
 from datetime import datetime
 import time  # add this at the top with your other imports
-from config import settings
+from app.core.config import settings
 
 
 def search_semantic_scholar(query: str, max_results: int = 10) -> list[dict]:
