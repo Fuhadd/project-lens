@@ -111,7 +111,7 @@ def display_results(papers: list[dict]) -> None:
 # ── Entry point ───────────────────────────────────────────
 if __name__ == "__main__":
     # Try changing this query to anything you're interested in
-    query = "student project idea generation AI"
+    query = "automated research idea generation natural language processing"
 
     papers = search_arxiv(query, max_results=5)
     display_results(papers)
