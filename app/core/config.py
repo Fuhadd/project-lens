@@ -1,15 +1,11 @@
 import os
 from dotenv import load_dotenv
 
-# Load .env file automatically
 load_dotenv()
 
 
 class Settings:
-    """
-    Central configuration for Project Lens.
-    All environment variables are read here — nowhere else.
-    """
+    """Central configuration for Project Lens."""
 
     # Semantic Scholar
     SEMANTIC_SCHOLAR_API_KEY: str = os.getenv("SEMANTIC_SCHOLAR_API_KEY", "")
@@ -24,11 +20,23 @@ class Settings:
         "https://export.arxiv.org/api/query"
     )
 
+    # Database
+    DATABASE_URL: str = os.getenv(
+        "DATABASE_URL",
+        "postgresql+asyncpg://lens_user:lenspassword@localhost:5432/project_lens"
+    )
+    SYNC_DATABASE_URL: str = os.getenv(
+        "SYNC_DATABASE_URL",
+        "postgresql://lens_user:lenspassword@localhost:5432/project_lens"
+    )
+
+    # Auth
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "change-this-in-production")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
+
     def validate(self):
-        """Warn if critical keys are missing."""
         if not self.SEMANTIC_SCHOLAR_API_KEY:
             print("⚠️  Warning: SEMANTIC_SCHOLAR_API_KEY not set in .env")
 
 
-# Single instance used across the whole app
 settings = Settings()

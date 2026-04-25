@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import search, health
+from app.routers import search, health, auth, history
 
 # ── App definition ────────────────────────────────────────
 app = FastAPI(
@@ -42,6 +42,8 @@ app.add_middleware(
 # ── Routers ───────────────────────────────────────────────
 app.include_router(health.router)
 app.include_router(search.router, prefix="/api/v1")
+app.include_router(auth.router)
+app.include_router(history.router)
 
 
 # ── Root ──────────────────────────────────────────────────

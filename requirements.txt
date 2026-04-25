@@ -41,6 +41,7 @@ astropy @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_a0
 astropy-iers-data @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_94mvdt0ezd/croot/astropy-iers-data_1737137597239/work
 asttokens @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_11i8cnwuxs/croot/asttokens_1743630449718/work
 async-lru @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/async-lru_1728588685926/work
+asyncpg==0.31.0
 asyncssh @ file:///Users/builder/cbouss/buildout/croot/asyncssh_1732921222384/work
 atomicwrites==1.4.0
 attrs @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_93pjmt0git/croot/attrs_1734533120523/work
@@ -102,6 +103,7 @@ distro @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/distro_
 dmglib @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_2f63rb3f79/croot/dmglib_1744638527725/work
 docstring-to-markdown @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/docstring-to-markdown_1728594227685/work
 docutils @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_f5szm7sjj2/croot/docutils_1744664123977/work
+ecdsa==0.19.2
 et_xmlfile @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/et_xmlfile_1728594253367/work
 evalidate @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_26kv6ehh61/croot/evalidate_1743606021523/work
 executing @ file:///opt/conda/conda-bld/executing_1646925071911/work
@@ -229,6 +231,7 @@ param @ file:///Users/builder/cbouss/buildout/croot/param_1739484660218/work
 parsel @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/parsel_1728594980311/work
 parso @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_8824a1w4md/croot/parso_1733963320105/work
 partd @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_00gzvqt15t/croot/partd_1736803428764/work
+passlib==1.7.4
 pathspec @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/pathspec_1728584715157/work
 patsy @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_387cydj4cl/croot/patsy_1738159938409/work
 pexpect @ file:///tmp/build/80754af9/pexpect_1605563209008/work
@@ -247,11 +250,12 @@ propcache @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_
 Protego @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_417x0vb4sd/croot/protego_1746474581924/work
 protobuf @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_73kluigbu7/croot/protobuf_1742426204819/work/bazel-bin/python/dist/protobuf-5.29.3-cp313-abi3-macosx_11_0_arm64.whl#sha256=e07b26660ea2f25386081d62b3650f5037d5028ca61f604b9a6148c4b9ee9ddf
 psutil @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_10oa1k8l11/croot/psutil_1736367646006/work
+psycopg2-binary==2.9.12
 ptyprocess @ file:///tmp/build/80754af9/ptyprocess_1609355006118/work/dist/ptyprocess-0.7.0-py2.py3-none-any.whl
 pure-eval @ file:///opt/conda/conda-bld/pure_eval_1646925070566/work
 py-cpuinfo @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/py-cpuinfo_1728593043967/work
 pyarrow @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_a8rnfim4h1/croot/pyarrow_1738232810450/work/python
-pyasn1 @ file:///Users/ktietz/demo/mc3/conda-bld/pyasn1_1629708007385/work
+pyasn1==0.6.3
 pyasn1-modules==0.2.8
 pycodestyle @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/pycodestyle_1728593062144/work
 pycosat @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_61k1o_oje7/croot/pycosat_1736868429741/work
@@ -286,10 +290,12 @@ PySocks @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/pysock
 pytest @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_eb_o59tqte/croot/pytest_1738938845265/work
 python-dateutil @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/python-dateutil_1728585579455/work
 python-dotenv @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_0bqseadoho/croot/python-dotenv_1745610246418/work
+python-jose==3.5.0
 python-json-logger @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_9bjmcmh4nm/croot/python-json-logger_1734370248301/work
 python-lsp-black @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_27y6e_0rf3/croot/python-lsp-black_1744023216832/work
 python-lsp-jsonrpc @ file:///croot/python-lsp-jsonrpc_1708962872556/work
 python-lsp-server @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_9e46mdfob4/croot/python-lsp-server_1743715805868/work
+python-multipart==0.0.26
 python-slugify @ file:///tmp/build/80754af9/python-slugify_1620405669636/work
 pytoolconfig @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/pytoolconfig_1728593267795/work
 pytz @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/pytz_1728586101417/work
@@ -316,6 +322,7 @@ rich @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_034my
 roman-numerals-py @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_23k02cxtth/croot/roman-numerals-py_1744666286067/work
 rope @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_9ci6xl5vh7/croot/rope_1743709219355/work
 rpds-py @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_3awdke3eyt/croot/rpds-py_1736542475137/work
+rsa==4.9.1
 Rtree @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/rtree_1728595390555/work
 ruamel.yaml @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_beoui95smx/croot/ruamel.yaml_1745960312720/work
 ruamel.yaml.clib @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_d9xusw0yil/croot/ruamel.yaml.clib_1745937162586/work
