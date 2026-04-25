@@ -410,3 +410,28 @@ async def generate_ideas_ai(
         raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"AI generation failed: {str(e)}")
+    
+@router.get("/datasets", tags=["Datasets"])
+async def search_datasets_endpoint(
+    q: str = Query(..., min_length=3, description="Research topic to find datasets for"),
+    limit: int = Query(5, ge=1, le=10),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    **📊 Dataset Discovery**
+
+    Search Kaggle and HuggingFace for datasets relevant
+    to your research topic.
+
+    Returns datasets sorted by quality score with download
+    stats, licenses, and direct links.
+
+    **Example:** `/datasets?q=student+performance+prediction`
+    """
+    from app.services.datasets import search_datasets
+
+    try:
+        results = search_datasets(query=q, max_per_source=limit)
+        return results
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

@@ -34,6 +34,10 @@ class Settings:
     SECRET_KEY: str = os.getenv("SECRET_KEY", "change-this-in-production")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+    
+    KAGGLE_API_TOKEN: str = os.getenv("KAGGLE_API_TOKEN", "")
+    HUGGINGFACE_API_KEY: str = os.getenv("HUGGINGFACE_API_KEY", "")
+    KAGGLE_USERNAME: str = os.getenv("KAGGLE_USERNAME", "")
 
     def validate(self):
         if not self.SEMANTIC_SCHOLAR_API_KEY:

@@ -7,7 +7,7 @@ from semantic_scholar import search_semantic_scholar
 from github_search import search_github_repos, identify_gaps
 import json
 from datetime import datetime
-
+from app.services.datasets import search_datasets as fetch_datasets
 
 def unified_search(query: str, max_per_source: int = 5) -> dict:
     """
@@ -48,17 +48,29 @@ def unified_search(query: str, max_per_source: int = 5) -> dict:
         "repos": repos,
     }
     results["gaps"] = gaps
+    
+    # ── 4. Datasets ───────────────────────────────────────
+    dataset_results = fetch_datasets(query=query, max_per_source=max_per_source)
+    results["sources"]["datasets"] = {
+        "count": dataset_results["total"],
+        "kaggle": dataset_results["kaggle_count"],
+        "huggingface": dataset_results["huggingface_count"],
+        "datasets": dataset_results["datasets"],
+    }
 
     # ── 4. Deduplicate papers across arXiv + Semantic Scholar
     all_papers = deduplicate_papers(arxiv_papers, ss_papers)
 
     # ── 5. Summary ────────────────────────────────────────
     results["summary"] = {
-        "total_results": len(all_papers) + len(repos),
+        "total_results": len(all_papers) + len(repos) + dataset_results["total"],
         "arxiv_papers": len(arxiv_papers),
         "semantic_scholar_papers": len(ss_papers),
         "unique_papers": len(all_papers),
         "github_repos": len(repos),
+        "datasets_found": dataset_results["total"],
+        "kaggle_datasets": dataset_results["kaggle_count"],
+        "huggingface_datasets": dataset_results["huggingface_count"],
         "average_repo_quality": gaps.get("average_quality_score", 0),
         "gap_opportunities": gaps.get("gap_opportunities", []),
         "verdict": generate_verdict(all_papers, repos, gaps),
