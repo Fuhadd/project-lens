@@ -43,8 +43,8 @@ Project Lens is an intelligent platform that:
 |-------|------------------------------|----------------|
 | 1     | Python foundations & tooling | ✅ Complete    |
 | 2     | FastAPI backend & databases  | ✅ Complete    |
-| 3     | AI / NLP core (FYP)          | 🔄 In progress |
-| 4     | Flutter mobile app           | ⏳ Upcoming    |
+| 3     | AI / NLP core (FYP)          | ✅ Complete    |
+| 4     | Flutter mobile app           | 🔄 In progress |
 | 5     | React web frontend           | ⏳ Upcoming    |
 | 6     | Production & DevOps          | ⏳ Upcoming    |
 
