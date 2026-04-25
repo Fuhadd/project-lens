@@ -33,6 +33,7 @@ class Settings:
     # Auth
     SECRET_KEY: str = os.getenv("SECRET_KEY", "change-this-in-production")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
+    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
 
     def validate(self):
         if not self.SEMANTIC_SCHOLAR_API_KEY:

@@ -16,6 +16,7 @@ from app.integrations.github_search import search_github_repos, identify_gaps
 from app.integrations.unified_search import unified_search, deduplicate_papers, generate_verdict
 from app.services.auth import decode_access_token
 from app.services.nlp import check_novelty, identify_research_gaps
+from app.services.llm import generate_ideas_with_llm
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
@@ -339,3 +340,73 @@ def _generate_idea_suggestions(
         })
 
     return ideas
+@router.get("/generate-ideas/ai", tags=["AI / NLP"])
+async def generate_ideas_ai(
+    field: str = Query(..., description="Your academic field"),
+    interests: str = Query(..., description="Your interests, comma separated"),
+    level: str = Query("undergraduate", description="undergraduate, masters, or phd"),
+    db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_optional_user),
+):
+    """
+    **🤖 AI-Powered Idea Generator (Claude)**
+
+    Uses Claude AI + real paper/repo data to generate specific,
+    grounded research ideas tailored to your field and interests.
+
+    This endpoint:
+    1. Searches real papers and repos in your field
+    2. Runs gap analysis using our NLP engine
+    3. Passes everything to Claude to generate grounded ideas
+    4. Returns 3 rich, specific, novel project ideas
+
+    **Requires login** for full results.
+    **Free tier:** Use /generate-ideas for gap-based suggestions.
+    """
+    # from app.services.nlp import identify_research_gaps
+    # from app.services.unified import unified_search
+    # from app.services.llm import generate_ideas_with_llm
+
+    if not current_user:
+        raise HTTPException(
+            status_code=401,
+            detail="Login required to use AI-powered idea generation. "
+                   "Use /generate-ideas for free gap-based suggestions."
+        )
+
+    try:
+        # 1. Search for existing work
+        query = f"{field} {interests}"
+        results = unified_search(query=query, max_per_source=8)
+        papers = results.get("all_papers", [])
+        repos = results["sources"].get("github", {}).get("repos", [])
+
+        # 2. Run gap analysis
+        gap_data = identify_research_gaps(query=query, papers=papers, repos=repos)
+        gaps = gap_data.get("gaps", [])
+
+        # 3. Generate with Claude
+        ai_results = generate_ideas_with_llm(
+            field=field,
+            interests=interests,
+            level=level,
+            papers=papers,
+            repos=repos,
+            gaps=gaps,
+        )
+
+        return {
+            "field": field,
+            "interests": interests,
+            "level": level,
+            "tier": "ai_powered",
+            "generated_by": "GPT-4o (OpenAI)",
+            "ideas": ai_results["ideas"],
+            "context_used": ai_results["context_used"],
+            "tip": "Use /generate-ideas for instant free suggestions without AI.",
+        }
+
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI generation failed: {str(e)}")
